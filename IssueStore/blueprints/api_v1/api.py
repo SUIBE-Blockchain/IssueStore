@@ -2,10 +2,11 @@ from flask import render_template, request, flash, redirect, url_for,  jsonify, 
 
 from github import Github
 
-git_bot = Github("99kies", "xxxxxxx")
 
 api_v1 = Blueprint('api_v1', __name__)
 
+
+git_bot = Github("suibe-bot", "xxxxxxxxxxxxxxxxxx")
 repo = git_bot.get_repo("SUIBE-Blockchain/IssueStore")
 
 @api_v1.route('/issuestore', methods=["POST", "GET"])
@@ -45,4 +46,15 @@ def issue_store():
         "code": "201"
     })
 
-    # for repo in g.get
+@api_v1.route('/listissues', methods=['GET','POST'])
+def listissues():
+    issues_list = []
+    for issue in repo.get_issues():
+        issue_dict = {}
+        issue_dict['labels'] = [label.name for label in issue.labels]
+        issue_dict['title'] = issue.title
+        issue_dict['body'] = issue.body
+        issue_dict['number'] = issue.number
+        issues_list.append(issue_dict)
+
+    return jsonify(issues_list)
